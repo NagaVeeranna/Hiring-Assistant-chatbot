@@ -100,6 +100,27 @@ streamlit run app.py
 
 ---
 
+## 🧠 Prompt Design
+
+The system employs a multi-layered prompting strategy to ensure professional-grade interactions:
+- **Persona Adoption**: The AI is instructed to act as a *Senior Technical Interviewer*. This ensures a tone that is authoritative yet encouraging, setting a high standard for responses.
+- **JSON Extraction Constraints**: The `EXTRACTION_PROMPT` uses strict one-shot instruction to force the model into returning valid JSON. This allows the system to update the sidebar profile in real-time without manual data entry.
+- **Anti-Cliché Guardrails**: To avoid repetitive "textbook" questions (like *lists vs tuples*), the `QUESTION_GENERATION_PROMPT` includes a **CRITICAL VARIETY RULE**. It explicitly forbids common questions and forces the model to generate architectural, scenario-based inquiries.
+
+---
+
+## 🚧 Challenges & Solutions
+
+Developing a robust AI-driven screening tool presented several technical hurdles:
+- **Rate-Limiting (429 Errors)**: Hosting the app on a public server meant many users shared the same API quota. 
+  - **Solution**: Implemented a **Multi-API Key Rotation pool** that automatically detects failures and cycles to a fresh key.
+- **Unstructured Data Extraction**: LLMs can sometimes return malformed JSON or ignore fields.
+  - **Solution**: Created a multi-pass system using a **Background Pydantic extraction layer** combined with a **Regex-based fallback worker** to ensure no candidate info is lost.
+- **Windows Encoding Issues**: Debug logging frequently crashed on Windows due to Unicode characters ($\rightarrow$).
+  - **Solution**: Developed a `safe_print` utility that handles codec errors and ensures cross-platform stability.
+
+---
+
 ## 🛡️ License & Privacy
 - **Privacy First**: All candidate data is handled locally within the session state.
 - **GDPR Ready**: Integrated compliance captions and professional data handling protocols.
