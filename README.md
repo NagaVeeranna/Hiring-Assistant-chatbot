@@ -64,6 +64,21 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 🔑 Multi-API Key Support (High Availability)
+To prevent "429: Rate Limit Exceeded" errors during high traffic (e.g., when hosted on Streamlit Cloud), you can provide multiple API keys:
+
+1. Open your `.env` file.
+2. Replace `GOOGLE_API_KEY` with `GEMINI_API_KEYS`.
+3. List your keys separated by commas:
+```env
+# Single key (standard)
+GOOGLE_API_KEY=your_key_here
+
+# OR Multiple keys for automatic rotation
+GEMINI_API_KEYS=key1,key2,key3,key4
+```
+The application will automatically switch to a fresh key if one hits a quota limit.
+
 ### 3. Configuration
 Create a `.env` file in the root directory:
 ```env

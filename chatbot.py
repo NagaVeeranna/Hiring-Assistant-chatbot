@@ -175,34 +175,15 @@ class GeminiClient:
                         safe_print(f"❌ Gemini error: {e}. Attempting rotation...")
                     
                     self._rotate_key()
-                    time.sleep(self.retry_delay)
+                    # Add small exponential backoff if it's a rate limit
+                    wait_time = self.retry_delay * (1.5 ** (attempt % len(self.api_keys)))
+                    time.sleep(wait_time)
                 else:
                     safe_print(f"🔥 Critical: All API keys exhausted or failing. {e}")
+                    # Final fallback if all else fails
+                    if is_rate_limit:
+                        return "I'm currently experiencing high demand. Please try again in a moment."
                     raise e
-                    self.cache[cache_key] = result
-                
-                return result
-                
-            except Exception as e:
-                error_str = str(e)
-                safe_print(f"Error: {error_str}")  # Debug
-                
-                # Handle rate limiting (429)
-                if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
-                    if attempt < self.max_retries - 1:
-                        wait_time = self.retry_delay * (2 ** attempt)  # Exponential backoff
-                        safe_print(f"Rate limited, waiting {wait_time} seconds...")
-                        time.sleep(wait_time)
-                        continue
-                    else:
-                        return "I'm experiencing high demand. Please try again in a moment."
-                
-                # Handle other errors
-                elif attempt == self.max_retries - 1:
-                    return self._get_fallback_response(prompt)
-                else:
-                    time.sleep(self.retry_delay)
-                    continue
         
         return "I'm having trouble processing your request. Could you please rephrase?"
     
