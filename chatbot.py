@@ -106,12 +106,24 @@ class CandidateInfo(BaseModel):
 class GeminiClient:
     """Optimized client for Gemini 2.5 Flash with caching and retry logic"""
     
-    def __init__(self, api_key: str):
-        self.client = genai.Client(api_key=api_key)
-        self.model_id = 'gemini-2.5-flash'  # User-confirmed available model
-        self.max_retries = 3
-        self.cache = {}  # Simple cache for repeated prompts
-        self.retry_delay = 1  # Initial retry delay in seconds
+    def __init__(self, api_keys: List[str]):
+        self.api_keys = api_keys
+        self.current_key_index = 0
+        if not self.api_keys:
+            raise ValueError("At least one Gemini API key must be provided")
+            
+        self.client = genai.Client(api_key=self.api_keys[0])
+        self.model_id = 'gemini-2.5-flash'
+        self.max_retries = len(self.api_keys) * 2  # Proportional to number of keys
+        self.cache = {}
+        self.retry_delay = 1
+        
+    def _rotate_key(self):
+        """Switch to the next available API key in the pool"""
+        self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
+        new_key = self.api_keys[self.current_key_index]
+        safe_print(f"⚠️ Rotating API Key to instance {self.current_key_index + 1}/{len(self.api_keys)}...")
+        self.client = genai.Client(api_key=new_key)
         
     def _get_cache_key(self, prompt: str, temperature: float) -> str:
         """Generate cache key for prompts"""
@@ -128,10 +140,10 @@ class GeminiClient:
             safe_print(f"Cache hit for prompt: {prompt[:50]}...")  # Debug
             return self.cache[cache_key]
         
-        # Attempt with retries
+                # Attempt with retries and rotation
         for attempt in range(self.max_retries):
             try:
-                safe_print(f"Generating with Gemini (attempt {attempt + 1})...")  # Debug
+                safe_print(f"Generating with Gemini (Key {self.current_key_index+1})...")  # Debug
                 response = self.client.models.generate_content(
                     model=self.model_id,
                     contents=prompt,
@@ -148,6 +160,25 @@ class GeminiClient:
                 
                 # Cache the result (if caching enabled)
                 if use_cache:
+                    self.cache[cache_key] = result
+                
+                return result
+                
+            except Exception as e:
+                error_msg = str(e).lower()
+                is_rate_limit = "429" in error_msg or "quota" in error_msg or "resource_exhausted" in error_msg
+                
+                if attempt < self.max_retries - 1:
+                    if is_rate_limit:
+                        safe_print(f"⛔ Rate limit hit on Key {self.current_key_index+1}. Rotating...")
+                    else:
+                        safe_print(f"❌ Gemini error: {e}. Attempting rotation...")
+                    
+                    self._rotate_key()
+                    time.sleep(self.retry_delay)
+                else:
+                    safe_print(f"🔥 Critical: All API keys exhausted or failing. {e}")
+                    raise e
                     self.cache[cache_key] = result
                 
                 return result
@@ -203,11 +234,19 @@ class HiringAssistant:
     """Main chatbot class for TalentScout Hiring Assistant"""
     
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY not found in environment variables")
+        # Support both single key (GOOGLE_API_KEY) and multi-keys (GEMINI_API_KEYS)
+        keys_str = os.getenv("GEMINI_API_KEYS") or os.getenv("GOOGLE_API_KEY")
         
-        self.gemini = GeminiClient(api_key)
+        if not keys_str:
+            raise ValueError("No Gemini API keys found. Please set GOOGLE_API_KEY or GEMINI_API_KEYS (comma-separated) in .env")
+        
+        # Parse keys (handles single key or comma-separated list)
+        api_keys = [k.strip() for k in keys_str.split(',') if k.strip()]
+        
+        if not api_keys:
+            raise ValueError("Invalid API key format in environment variables.")
+            
+        self.gemini = GeminiClient(api_keys)
         self.candidate_data = CandidateInfo()
         self.conversation_phase = "Greeting"
         self.questions = []
