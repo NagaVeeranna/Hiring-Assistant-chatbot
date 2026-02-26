@@ -1,62 +1,80 @@
-# TalentScout AI - Hiring Assistant Chatbot
+# 🚀 TalentScout AI - Premium Hiring Assistant
 
-TalentScout AI is an intelligent hiring assistant designed to streamline the recruitment process. It automates initial candidate screening by gathering essential information and generating technical questions tailored to the candidate's specific tech stack.
+**TalentScout AI** is a professional, executive-level recruitment screening platform designed to streamline initial candidate interviews through intelligent, AI-driven conversation. Built for performance and aesthetics, it delivers a "Real Product" experience comparable to modern SaaS leaders like Stripe and Linear.
 
-## ✨ Features
+---
 
-- **Personalized Greeting**: Warm and professional introduction explaining the assistant's purpose.
-- **Smart Info Gathering**: Dynamically extracts candidate details (Name, Contact, Experience, Stack).
-- **Technical Question Generation**: Leverages Google Gemini AI to generate 3-5 technical questions based on the declared tech stack and experience level.
-- **Realistic Experience**: Features typing animations, professional UI styling, and a reactive candidate profile sidebar.
-- **Context-Aware Interactions**: Uses LLM-driven conversation history to maintain flow and handle fallbacks.
+## ✨ Key Features
 
-## 🛠️ Technical Details
+### 🧠 Intelligent Technical Screening
+- **Dynamic Info Gathering**: Automatically extracts candidate details (Name, Contact, Experience, Stack) from natural dialogue.
+- **Deep Technical Variety**: Generators 3-5 high-quality, non-cliché technical questions specifically tailored to the candidate's seniority.
+- **Strict Variety Guardrails**: Explicitly avoids basic clichés (e.g., "lists vs tuples") to test genuine architectural and scenario-based intuition.
 
-- **Frontend**: Streamlit
-- **LLM**: Google Gemini 2.5 Flash (via `google-generativeai`)
-- **Data Handling**: Pydantic for schema validation and structured data extraction.
-- **Environment Management**: `python-dotenv`
+### 📊 Professional Data Management
+- **Q&A Extraction**: Accurately pairs interview questions with candidate answers for precise review.
+- **Multi-Format Export**: Instantly export candidate profiles and full interview transcripts to **CSV** or **JSON**.
+- **Sentiment Insights**: Real-time analysis of candidate demeanor, engagement, and confidence levels.
 
-## 🚀 Installation & Usage
+### 🎨 Executive-Level UX
+- **Stripe-Inspired Interface**: A clean, minimal white dashboard with soft blue accents, glassmorphism sidebars, and elevated chat components.
+- **Responsive Animations**: Features professional typing simulations and interactive hover states.
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd "Hiring Assistant"
-   ```
+### 🛠️ Strategic Stability
+- **Universal Compatibility**: Includes a specialized `safe_print` utility to prevent Unicode crashes on Windows environments.
+- **UUID Seeding**: Every generation cycle uses unique entropy to prevent repetitive AI patterns across sessions.
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-3. **Set up API Key**:
-   - Create a `.env` file in the root directory.
-   - Add your Google Gemini API key:
-     ```env
-     GOOGLE_API_KEY=your_actual_key_here
-     ```
+## 🛠️ Technology Stack
 
-4. **Run the application**:
-   ```bash
-   streamlit run app.py
-   ```
+| Layer | Technology |
+| :--- | :--- |
+| **Core** | Python 3.10+ |
+| **Frontend** | Streamlit |
+| **AI Engine** | Google Gemini 2.5 Flash |
+| **NLP** | TextBlob (Sentiment Analysis) |
+| **Validation** | Pydantic |
+| **Styling** | Custom Vanilla CSS (Premium SaaS Aesthetic) |
 
-## 🧠 Prompt Design
+---
 
-The system uses a multi-layered prompting strategy:
-1. **System Prompt**: Defines the persona (TalentScout AI), the conversation flow, and style guidelines.
-2. **Extraction Prompt**: A specialized JSON extraction prompt is used for every user message to update the candidate's profile in the sidebar in real-time.
-3. **Question Generation Prompt**: Dynamically constructs a prompt using the extracted tech stack and experience years to ensure relevant and appropriately challenging questions.
+## 🚀 Getting Started
 
-## 🛡️ Data Privacy
+### 1. Prerequisites
+- Python 3.10 or higher
+- A Google Gemini API Key ([Get it here](https://aistudio.google.com/app/apikey))
 
-- **Simulated Data**: All candidate data is handled locally within the session state.
-- **Privacy First**: The bot is designed to strictly adhere to the interview context and simulated screening process.
+### 2. Installation
+```bash
+git clone https://github.com/NagaVeeranna/Hiring-Assistant-chatbot.git
+cd Hiring-Assistant-chatbot
+pip install -r requirements.txt
+```
 
-## 🚧 Challenges & Solutions
+### 3. Configuration
+Create a `.env` file in the root directory:
+```env
+GOOGLE_API_KEY=your_gemini_api_key_here
+```
 
-- **Challenge**: Extracting unstructured data into a structured candidate profile.
-- **Solution**: Implemented a background Pydantic-based extraction layer that runs concurrently with the conversation flow.
-- **Challenge**: Making the bot feel "realistic" in a web interface.
-- **Solution**: Added a custom typing animation and Streamlit status indicators to simulate AI processing time.
+### 4. Launch
+```bash
+streamlit run app.py
+```
+
+---
+
+## 📂 Project Structure
+- `app.py`: Main Streamlit dashboard and premium UI orchestration.
+- `chatbot.py`: Core logic, AI prompt management, and question generation engine.
+- `utils.py`: Export managers, sentiment analysis, and tech stack parsers.
+- `prompts.py`: Highly refined AI persona and instruction templates.
+
+---
+
+## 🛡️ License & Privacy
+- **Privacy First**: All candidate data is handled locally within the session state.
+- **GDPR Ready**: Integrated compliance captions and professional data handling protocols.
+
+Developed with ❤️ for **TalentScout AI**.
